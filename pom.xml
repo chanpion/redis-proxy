@@ -12,6 +12,7 @@
         <module>redis-proxy-bootstrap</module>
         <module>redis-proxy-admin</module>
         <module>redis-proxy-test</module>
+        <module>redis-proxy-core</module>
     </modules>
 
 
@@ -52,6 +53,12 @@
                         <artifactId>spring-boot-starter-logging</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>1.2.56</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
