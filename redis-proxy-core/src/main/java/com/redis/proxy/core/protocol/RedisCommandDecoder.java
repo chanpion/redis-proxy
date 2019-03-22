@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,11 +32,27 @@ public class RedisCommandDecoder extends ReplayingDecoder<DecodeState> {
                     b = in.readByte();
                     in.readerIndex(in.readerIndex() - 1);
                     checkpoint(DecodeState.DECODE_ARG_COUNT);
-                } else if (b == RedisConsts.PING_BYTE) {
+                } else if (b == RedisConsts.PING_BYTE) {//redis-benchmark
                     in.resetReaderIndex();
-
+                    redisCommand.setArgCount(readInt(in));
+                    List<byte[]> args = new ArrayList<byte[]>(redisCommand.getArgCount());
+                    args.add(RedisConsts.PING.getBytes());
+                    redisCommand.setArgs(args);
+                    checkpoint(DecodeState.DECODE_ARG_COUNT);
                 } else {
                     throw new Exception("DECODE_INIT unexpected character, ch: " + String.valueOf(b));
+                }
+            case DECODE_ARG_COUNT:
+                if (redisCommand != null && redisCommand.getArgCount() == 0) {
+                    redisCommand.setArgCount(readInt(in));
+                }
+                checkpoint(DecodeState.DECODE_ARG);
+            case DECODE_ARG:
+                if (redisCommand.getArgs() == null || redisCommand.getArgs().size() == 0) {
+                    List<byte[]> args = new ArrayList<byte[]>(redisCommand.getArgCount());
+                    while (args.size() < redisCommand.getArgCount()) {
+                        byte by = in.readByte();
+                    }
                 }
         }
     }
